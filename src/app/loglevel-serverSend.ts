@@ -19,7 +19,7 @@ export const loglevelServerSend = function (logger: Logger, options?:any) {
         throw new Error('loglevel instance has to be specified in order to be extended')
 
     var _logger          = logger,
-        _url             = options && options.url || 'http://localhost/wado/log?name=eiweb&level=error',
+        _url             = options && options.url || '/wado/log',
         _callOriginal    = options && options.callOriginal || false,
         _prefix          = options && options.prefix,
         _originalFactory = _logger.methodFactory,
@@ -35,7 +35,7 @@ export const loglevelServerSend = function (logger: Logger, options?:any) {
             else if (typeof _prefix === 'function')
                 message = _prefix(methodName,message)
             else
-                message = methodName + ': ' + message
+              message = `name=eiweb.${loggerName}&level=error&message=${message}`
 
             if (_callOriginal)
                 rawMethod(message)

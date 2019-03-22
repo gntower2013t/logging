@@ -1,0 +1,14 @@
+<jboss-deployment-structure>
+   <deployment>
+     <dependencies>
+        <module name="javax.mail.api" />
+        <module name="xero.imagereaders" />
+        <module name="xero.thirdparty" />
+        <module name="xero-core.util" />
+        <module name="xero.pegasus" />
+        <module name="deployment.cdp-security.jar" />
+        <module name="deployment.cdp-wildfly.jar" />
+        <module name="deployment.server-customization.war" optional="true"/>
+     </dependencies>
+   </deployment>
+</jboss-deployment-structure>

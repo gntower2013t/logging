@@ -21,7 +21,9 @@ export class AppComponent {
   doLog() {
     // log.setLevel("WARN")
     // Logger.setLevel("WARN")
-    Logger.info("button log")
+    // Logger.info("button log")
+    Logger.info(new Error().stack)
+
 
   }
 }
