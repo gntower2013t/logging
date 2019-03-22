@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
-import * as log from 'loglevel';
-import { loglevelServerSend } from './loglevel-serverSend';
+import { Component, NgZone } from '@angular/core';
+import { eilog } from './log-conf';
 
-loglevelServerSend(log);
-const Logger = log.getLogger("app-comp")
+const Logger = eilog.getLogger("app-comp")
+const AppErr = eilog.getLogger("app-err")
+
 
 @Component({
   selector: 'app-root',
@@ -13,16 +13,36 @@ const Logger = log.getLogger("app-comp")
 export class AppComponent {
   title = 'app';
 
+  constructor(zone: NgZone) {
+    zone.onError.subscribe(e => {
+      console.log("xxxxxxxxxxxxxxxxx");
+      // console.log(e);
+      AppErr.error(e)
+    });
+
+/*     setTimeout(() => {
+      throw new Error();
+    }, 5000); */
+
+/*     setTimeout(() => {
+      Promise.reject('unhandled');
+    }, 1000); */
+  }
+
   ngOnInit(): void {
     Logger.setLevel("debug")
-    Logger.info("ultra-compatible", {a:"aaa"});
+    // Logger.info("ultra-compatible", {a:"aaa"});
   }
 
   doLog() {
     // log.setLevel("WARN")
     // Logger.setLevel("WARN")
     // Logger.info("button log")
-    Logger.info(new Error().stack)
+    // Logger.info(new Error().stack)
+    throw new Error("aaa")
+/*     setTimeout(() => {
+      throw new Error("do log button");
+    }, 1000); */
 
 
   }

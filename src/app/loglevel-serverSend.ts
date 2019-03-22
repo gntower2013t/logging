@@ -35,6 +35,10 @@ export const loglevelServerSend = function (logger: Logger, options?:any) {
             else if (typeof _prefix === 'function')
                 message = _prefix(methodName,message)
             else
+              message = message.replace(/\n/g, "")
+              message = message.replace(/[\[<]/g, "(")
+              message = message.replace(/[\]>]/g, ")")
+              message =  encodeURIComponent(message)
               message = `name=eiweb.${loggerName}&level=error&message=${message}`
 
             if (_callOriginal)
