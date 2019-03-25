@@ -2,7 +2,7 @@ import { Component, NgZone } from '@angular/core';
 import { eilog } from './log-conf';
 
 const Logger = eilog.getLogger("app-comp")
-const AppErr = eilog.getLogger("app-err")
+const AppErr = eilog.getLogger("ngZone-err")
 
 
 @Component({
@@ -15,9 +15,9 @@ export class AppComponent {
 
   constructor(zone: NgZone) {
     zone.onError.subscribe(e => {
-      console.log("xxxxxxxxxxxxxxxxx");
+      // console.log("xxxxxxxxxxxxxxxxx");
       // console.log(e);
-      AppErr.error(e)
+      // AppErr.error(e)
     });
 
 /*     setTimeout(() => {
@@ -30,20 +30,24 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
-    Logger.setLevel("debug")
-    // Logger.info("ultra-compatible", {a:"aaa"});
+    // Logger.setLevel("debug")
+    Logger.info("ultra-compatible", {a:"aaa"});
   }
 
   doLog() {
     // log.setLevel("WARN")
     // Logger.setLevel("WARN")
-    // Logger.info("button log")
+    Logger.debug("button debug")
+
+
+  }
+
+  doError() {
     // Logger.info(new Error().stack)
     throw new Error("aaa")
 /*     setTimeout(() => {
       throw new Error("do log button");
-    }, 1000); */
-
-
+    }, 1000);
+ */
   }
 }

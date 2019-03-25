@@ -1,4 +1,11 @@
-import { Logger } from 'loglevel';
+import { Logger, levels, LogLevel } from 'loglevel';
+
+interface ServerOption {
+  url: string;
+  // callOriginal?:boolean;
+  prefix?: string;
+  level?: number;
+}
 
 /**
  * @description
@@ -14,13 +21,20 @@ import { Logger } from 'loglevel';
  *     return '[' + new Date().toISOString() + '] ' + logSev + ': ' + message + '\n'
  * }})
  */
-export const loglevelServerSend = function (logger: Logger, options?:any) {
+
+const defaultOption = {
+  // callOriginal: false,
+  level:levels.WARN
+}
+export const loglevelServerSend = function (logger: Logger, options: ServerOption) {
     if (!logger || !logger.methodFactory)
         throw new Error('loglevel instance has to be specified in order to be extended')
 
+  options = { ...defaultOption, ...options }
+
     var _logger          = logger,
         _url             = options && options.url || '/wado/log',
-        _callOriginal    = options && options.callOriginal || false,
+        // _callOriginal    = options && options.callOriginal || false,
         _prefix          = options && options.prefix,
         _originalFactory = _logger.methodFactory,
         _sendQueue       = [],
@@ -29,26 +43,43 @@ export const loglevelServerSend = function (logger: Logger, options?:any) {
     _logger.methodFactory = function (methodName, logLevel, loggerName) {
       var rawMethod = _originalFactory(methodName, logLevel, loggerName)
 
-        return function (message) {
-            if (typeof _prefix === 'string')
+      function processMsg(msgs: any[]): string{
+        return msgs.map(msg => typeof msg === 'string' ? msg : JSON.stringify(msg))
+          .reduce((acc,curr)=>acc+' '+curr)
+      }
+
+      return function (...msgs: any[]) {
+        // if (_callOriginal)
+          // rawMethod(msgs)
+
+        if (logLevel < options.level) {
+          rawMethod(msgs)
+          return;
+        }
+
+        let message = processMsg(msgs);
+            // if (typeof _prefix === 'string')
+        if(_prefix)
                 message = _prefix + message
-            else if (typeof _prefix === 'function')
-                message = _prefix(methodName,message)
-            else
-              message = message.replace(/\n/g, "")
+            // else if (typeof _prefix === 'function')
+            //   message = _prefix(methodName, message)
+            // else
+              message = message.replace(/\n/g, "\\n")
               message = message.replace(/[\[<]/g, "(")
               message = message.replace(/[\]>]/g, ")")
               message =  encodeURIComponent(message)
               message = `name=eiweb.${loggerName}&level=error&message=${message}`
 
-            if (_callOriginal)
-                rawMethod(message)
+
 
             _sendQueue.push(message)
             _sendNextMessage()
         }
     }
-    _logger.setLevel(_logger.levels.WARN)
+
+  _logger.setLevel(_logger.levels.WARN)
+
+
 
     var _sendNextMessage = function(){
         if (!_sendQueue.length || _isSending)
